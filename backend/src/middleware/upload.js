@@ -32,9 +32,15 @@ if (process.env.CLOUDINARY_CLOUD_NAME) {
   });
 } else {
   // Fallback: Use local disk storage in development if no Cloudinary keys
-  const uploadsDir = path.join(__dirname, '../../uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+  const isVercel = process.env.VERCEL === '1';
+  const uploadsDir = isVercel ? '/tmp/uploads' : path.join(__dirname, '../../uploads');
+  
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('Could not create uploads directory, filesystem might be read-only:', err.message);
   }
 
   storage = multer.diskStorage({
