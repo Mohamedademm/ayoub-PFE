@@ -99,6 +99,28 @@ export const useStats = () => {
   useEffect(() => {
     const fetch = async () => {
       try {
+        const res = await api.get('/annexes/stats');
+        setStats(res.data.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, []);
+
+  return { stats, loading, error };
+};
+
+export const useAdminStats = () => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
         const res = await api.get('/admin/stats');
         setStats(res.data.data);
       } catch (err) {

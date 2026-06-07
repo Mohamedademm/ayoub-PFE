@@ -355,6 +355,38 @@ const getStats = async (req, res) => {
 };
 
 /**
+ * @desc    Get public statistics
+ * @route   GET /api/annexes/stats
+ * @access  Public
+ */
+const getPublicStats = async (req, res) => {
+  try {
+    const [activeAnnexes, totalViews, totalDownloads] = await Promise.all([
+      Annexe.countDocuments({ isActive: true }),
+      Annexe.aggregate([
+        { $match: { isActive: true } },
+        { $group: { _id: null, total: { $sum: '$views' } } },
+      ]),
+      Annexe.aggregate([
+        { $match: { isActive: true } },
+        { $group: { _id: null, total: { $sum: '$downloads' } } },
+      ]),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        activeAnnexes,
+        totalViews: totalViews[0]?.total || 0,
+        totalDownloads: totalDownloads[0]?.total || 0,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
  * @desc    Get categories list
  * @route   GET /api/categories
  * @access  Public
@@ -384,5 +416,7 @@ module.exports = {
   toggleAnnexe,
   trackDownload,
   getStats,
+  getPublicStats,
   getCategories,
 };
+

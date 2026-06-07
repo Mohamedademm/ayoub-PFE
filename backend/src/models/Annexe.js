@@ -88,20 +88,9 @@ const annexeSchema = new mongoose.Schema(
   }
 );
 
-// Auto-generate slug before saving
-annexeSchema.pre('save', function (next) {
-  if (this.isModified('title') && !this.slug) {
-    this.slug = slugify(this.title, {
-      lower: true,
-      strict: true,
-      locale: 'fr',
-    });
-  }
-  next();
-});
+// Note: slug is generated in the controller before creating the document
 
 // Indexes for search performance
-annexeSchema.index({ slug: 1 });
 annexeSchema.index({ category: 1 });
 annexeSchema.index({ isActive: 1 });
 annexeSchema.index({ title: 'text', description: 'text', tags: 'text' });
