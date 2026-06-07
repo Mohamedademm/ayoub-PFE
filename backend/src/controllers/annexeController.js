@@ -154,8 +154,10 @@ const createAnnexe = async (req, res) => {
       slug = `${slug}-${Date.now()}`;
     }
 
-    // File URL (accessible via static serving)
-    const fileUrl = `/uploads/${req.file.filename}`;
+    // File URL (accessible via static serving or Cloudinary URL)
+    const fileUrl = req.file.path && req.file.path.startsWith('http') 
+      ? req.file.path 
+      : `/uploads/${req.file.filename}`;
 
     // Page URL for QR Code
     const appUrl = process.env.APP_URL || 'http://localhost:5173';
@@ -217,7 +219,9 @@ const updateAnnexe = async (req, res) => {
           fs.unlinkSync(oldFilePath);
         }
       }
-      annexe.fileUrl = `/uploads/${req.file.filename}`;
+      annexe.fileUrl = req.file.path && req.file.path.startsWith('http') 
+        ? req.file.path 
+        : `/uploads/${req.file.filename}`;
       annexe.fileOriginalName = req.file.originalname;
       annexe.fileSize = req.file.size;
       annexe.fileType = req.file.mimetype;
